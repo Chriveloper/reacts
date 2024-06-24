@@ -40,3 +40,10 @@
 .read-the-docs {
   color: #888;
 }
+
+canvas {
+  border: 1px solid black;
+  display: block;
+  margin: 20px auto;
+}
+
