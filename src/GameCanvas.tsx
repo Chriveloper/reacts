@@ -25,6 +25,26 @@ const GameCanvas: React.FC = () => {
     addMonster(); // Add an initial monster
   }, []);
 
+  const checkCollisions = () => {
+    for (let i = 0; i < gameObjects.length; i++) {
+      for (let j = i + 1; j < gameObjects.length; j++) {
+        if (gameObjects[i].isCollidingWith(gameObjects[j])) {
+          // Handle collision here
+          // For now, just log it
+          console.log(`Collision detected between objects ${i} and ${j}`);
+
+          
+
+          
+
+
+
+
+        }
+      }
+    }
+  };
+
   const draw = (ctx: CanvasRenderingContext2D) => {
     ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 
@@ -52,6 +72,7 @@ const GameCanvas: React.FC = () => {
           gameObjects.forEach((obj) => {
             obj.move(deltaTime, context); // Pass ctx to move method
           });
+          checkCollisions(); // Check for collisions after moving objects
           draw(context);
         }
       }
