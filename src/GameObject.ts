@@ -17,6 +17,7 @@ export class GameObject {
   }
 
   draw(ctx: CanvasRenderingContext2D) {
+    
     // Draw the hitbox as a circle
     ctx.beginPath(); // Start a new path for the circle
     ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2); // Create a circle

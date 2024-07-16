@@ -1,6 +1,8 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { GameObject } from './GameObject';
+import { Player } from './Player'; // Import the Player class
 import monsterImageSrc from './assets/monster.png'; // Adjust the path to your monster image
+import playerImageSrc from './assets/player.png'; // Adjust the path to your player image
 
 const GameCanvas: React.FC = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -8,6 +10,7 @@ const GameCanvas: React.FC = () => {
   const previousTimeRef = useRef<number>();
   const [fps, setFps] = useState(0);
   const [gameObjects, setGameObjects] = useState<GameObject[]>([]);
+  const playerRef = useRef<Player | null>(null);
 
   const addMonster = () => {
     const newMonster = new GameObject(
@@ -18,32 +21,34 @@ const GameCanvas: React.FC = () => {
       Math.random() * 100 - 50,
       Math.random() * 100 - 50
     );
-    setGameObjects([...gameObjects, newMonster]);
+    setGameObjects((prev) => [...prev, newMonster]);
   };
 
   useEffect(() => {
+    const player = new Player(400, 300, 20, playerImageSrc, 200, 200); // Centered within the 800x600 canvas
+    playerRef.current = player;
+    setGameObjects((prev) => {
+      console.log('Player added', player);
+      return [...prev, player];
+    });
     addMonster(); // Add an initial monster
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      player.handleKeyDown(event);
+    };
+
+    const handleKeyUp = (event: KeyboardEvent) => {
+      player.handleKeyUp(event);
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    window.addEventListener('keyup', handleKeyUp);
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('keyup', handleKeyUp);
+    };
   }, []);
-
-  const checkCollisions = () => {
-    for (let i = 0; i < gameObjects.length; i++) {
-      for (let j = i + 1; j < gameObjects.length; j++) {
-        if (gameObjects[i].isCollidingWith(gameObjects[j])) {
-          // Handle collision here
-          // For now, just log it
-          console.log(`Collision detected between objects ${i} and ${j}`);
-
-          
-
-          
-
-
-
-
-        }
-      }
-    }
-  };
 
   const draw = (ctx: CanvasRenderingContext2D) => {
     ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
@@ -70,9 +75,12 @@ const GameCanvas: React.FC = () => {
         const context = canvas.getContext('2d');
         if (context) {
           gameObjects.forEach((obj) => {
-            obj.move(deltaTime, context); // Pass ctx to move method
+            if (obj instanceof Player) {
+              obj.update(deltaTime); // Update the player's position based on keys pressed
+            } else {
+              obj.move(deltaTime, context); // Pass ctx to move method
+            }
           });
-          checkCollisions(); // Check for collisions after moving objects
           draw(context);
         }
       }
